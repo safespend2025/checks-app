@@ -13,18 +13,18 @@
     .card {
       @apply bg-white rounded-2xl shadow-md p-6 mb-6 transition-all;
     }
-    .pill {
-      @apply px-4 py-2 rounded-full text-sm font-semibold cursor-pointer;
+    .tab-active {
+      @apply border-b-4 border-blue-500 text-blue-600 font-semibold;
     }
-    .pill-active {
-      @apply bg-blue-500 text-white shadow-md;
+    .expense-list {
+      @apply mt-3 text-sm text-gray-600;
     }
-    .pill-inactive {
-      @apply bg-gray-200 text-gray-700;
+    .expense-item {
+      @apply flex justify-between border-b py-1;
     }
   </style>
 </head>
-<body class="flex justify-center min-h-screen items-start py-10 px-4">
+<body class="flex justify-center min-h-screen items-start py-10">
 
   <div class="w-full max-w-md">
     <h1 class="text-2xl font-semibold text-center mb-6">💵 Checks$</h1>
@@ -40,42 +40,82 @@
       </button>
     </div>
 
-    <!-- Category Pills -->
-    <div id="categoryTabs" class="hidden flex justify-between bg-gray-100 p-2 rounded-full mb-6">
-      <div id="pillNeeds" onclick="showCategory('needs')" class="pill pill-active">Needs</div>
-      <div id="pillWants" onclick="showCategory('wants')" class="pill pill-inactive">Wants</div>
-      <div id="pillSavings" onclick="showCategory('savings')" class="pill pill-inactive">Savings</div>
+    <!-- Tabs -->
+    <div class="flex justify-around mb-6">
+      <button id="tabDashboard" onclick="showTab('dashboard')" class="tab-active px-4 py-2">Dashboard</button>
+      <button id="tabHistory" onclick="showTab('history')" class="px-4 py-2">History</button>
     </div>
 
-    <!-- Category Content -->
-    <div id="categoryContent" class="card hidden">
-      <h2 id="categoryTitle" class="text-xl font-semibold mb-2"></h2>
-      <p class="text-gray-600">Budget: $<span id="categoryBudget">0</span></p>
-      <p class="text-gray-800 font-semibold">Remaining: $<span id="categoryRemaining">0</span></p>
+    <!-- Dashboard Tab -->
+    <div id="dashboardTab" class="hidden">
 
-      <div class="flex mt-3 gap-2">
-        <input id="categoryInput" type="number" placeholder="Add expense"
-          class="flex-1 p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
-        <button onclick="addExpense(currentCategory)" 
-          class="px-4 bg-green-500 text-white rounded-xl hover:bg-green-600">+</button>
+      <!-- Needs -->
+      <div class="card">
+        <h2 class="text-xl font-semibold mb-2">🛒 Needs (50%)</h2>
+        <p class="text-gray-600">Budget: $<span id="needsBudget">0</span></p>
+        <p class="text-gray-800 font-semibold">Remaining: $<span id="needsRemaining">0</span></p>
+        <div class="flex mt-3 gap-2">
+          <input id="needsSpent" type="number" placeholder="Add expense"
+            class="flex-1 p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <button onclick="addExpense('needs')" 
+            class="px-4 bg-green-500 text-white rounded-xl hover:bg-green-600">+</button>
+        </div>
       </div>
 
-      <div id="categoryList" class="expense-list mt-4"></div>
+      <!-- Wants -->
+      <div class="card">
+        <h2 class="text-xl font-semibold mb-2">🎉 Wants (30%)</h2>
+        <p class="text-gray-600">Budget: $<span id="wantsBudget">0</span></p>
+        <p class="text-gray-800 font-semibold">Remaining: $<span id="wantsRemaining">0</span></p>
+        <div class="flex mt-3 gap-2">
+          <input id="wantsSpent" type="number" placeholder="Add expense"
+            class="flex-1 p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <button onclick="addExpense('wants')" 
+            class="px-4 bg-green-500 text-white rounded-xl hover:bg-green-600">+</button>
+        </div>
+      </div>
+
+      <!-- Savings -->
+      <div class="card">
+        <h2 class="text-xl font-semibold mb-2">💾 Savings (20%)</h2>
+        <p class="text-gray-600">Budget: $<span id="savingsBudget">0</span></p>
+        <p class="text-gray-800 font-semibold">Remaining: $<span id="savingsRemaining">0</span></p>
+        <div class="flex mt-3 gap-2">
+          <input id="savingsSpent" type="number" placeholder="Add expense"
+            class="flex-1 p-2 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <button onclick="addExpense('savings')" 
+            class="px-4 bg-green-500 text-white rounded-xl hover:bg-green-600">+</button>
+        </div>
+      </div>
+
+      <!-- Clear Button -->
+      <button onclick="clearAll()" 
+        class="w-full mt-4 bg-red-500 text-white py-3 rounded-xl font-semibold hover:bg-red-600 transition">
+        Clear All Data
+      </button>
     </div>
 
-    <!-- Clear All -->
-    <button onclick="clearAll()" 
-      class="w-full mt-4 bg-red-500 text-white py-3 rounded-xl font-semibold hover:bg-red-600 transition hidden"
-      id="clearBtn">
-      Clear All Data
-    </button>
+    <!-- History Tab -->
+    <div id="historyTab" class="hidden">
+      <div class="card">
+        <h2 class="text-xl font-semibold mb-3">🛒 Needs Expenses</h2>
+        <div id="needsList" class="expense-list"></div>
+      </div>
+      <div class="card">
+        <h2 class="text-xl font-semibold mb-3">🎉 Wants Expenses</h2>
+        <div id="wantsList" class="expense-list"></div>
+      </div>
+      <div class="card">
+        <h2 class="text-xl font-semibold mb-3">💾 Savings Expenses</h2>
+        <div id="savingsList" class="expense-list"></div>
+      </div>
+    </div>
   </div>
 
   <script>
     let budgets = { needs: 0, wants: 0, savings: 0 };
     let remaining = { needs: 0, wants: 0, savings: 0 };
     let expenses = { needs: [], wants: [], savings: [] };
-    let currentCategory = "needs";
 
     // Load saved data if exists
     window.onload = function () {
@@ -86,10 +126,9 @@
         expenses = savedData.expenses;
         document.getElementById("salary").value = savedData.salary;
         updateUI();
-        document.getElementById("categoryTabs").classList.remove("hidden");
-        document.getElementById("categoryContent").classList.remove("hidden");
-        document.getElementById("clearBtn").classList.remove("hidden");
-        showCategory("needs");
+        showTab("dashboard");
+      } else {
+        showTab("dashboard");
       }
     };
 
@@ -106,15 +145,11 @@
 
       saveData(salary);
       updateUI();
-
-      document.getElementById("categoryTabs").classList.remove("hidden");
-      document.getElementById("categoryContent").classList.remove("hidden");
-      document.getElementById("clearBtn").classList.remove("hidden");
-      showCategory("needs");
+      showTab("dashboard");
     }
 
     function addExpense(category) {
-      const input = document.getElementById("categoryInput");
+      const input = document.getElementById(category + "Spent");
       const value = parseFloat(input.value);
       if (isNaN(value) || value <= 0) return;
 
@@ -124,32 +159,27 @@
       input.value = ""; // clear input
       saveData(document.getElementById("salary").value);
       updateUI();
-      showCategory(category);
     }
 
     function updateUI() {
-      // Update active category data
-      showCategory(currentCategory);
+      // Budgets
+      document.getElementById("needsBudget").innerText = budgets.needs.toFixed(2);
+      document.getElementById("wantsBudget").innerText = budgets.wants.toFixed(2);
+      document.getElementById("savingsBudget").innerText = budgets.savings.toFixed(2);
+
+      // Remaining
+      document.getElementById("needsRemaining").innerText = remaining.needs.toFixed(2);
+      document.getElementById("wantsRemaining").innerText = remaining.wants.toFixed(2);
+      document.getElementById("savingsRemaining").innerText = remaining.savings.toFixed(2);
+
+      // Expense lists
+      renderList("needs");
+      renderList("wants");
+      renderList("savings");
     }
 
-    function showCategory(category) {
-      currentCategory = category;
-
-      // Update pills
-      document.getElementById("pillNeeds").className = "pill " + (category === "needs" ? "pill-active" : "pill-inactive");
-      document.getElementById("pillWants").className = "pill " + (category === "wants" ? "pill-active" : "pill-inactive");
-      document.getElementById("pillSavings").className = "pill " + (category === "savings" ? "pill-active" : "pill-inactive");
-
-      // Update title
-      let titles = { needs: "🛒 Needs (50%)", wants: "🎉 Wants (30%)", savings: "💾 Savings (20%)" };
-      document.getElementById("categoryTitle").innerText = titles[category];
-
-      // Budget + Remaining
-      document.getElementById("categoryBudget").innerText = budgets[category].toFixed(2);
-      document.getElementById("categoryRemaining").innerText = remaining[category].toFixed(2);
-
-      // Expense list
-      const list = document.getElementById("categoryList");
+    function renderList(category) {
+      const list = document.getElementById(category + "List");
       list.innerHTML = "";
       expenses[category].forEach((exp, i) => {
         const div = document.createElement("div");
@@ -170,9 +200,23 @@
       remaining = { needs: 0, wants: 0, savings: 0 };
       expenses = { needs: [], wants: [], savings: [] };
       document.getElementById("salary").value = "";
-      document.getElementById("categoryTabs").classList.add("hidden");
-      document.getElementById("categoryContent").classList.add("hidden");
-      document.getElementById("clearBtn").classList.add("hidden");
+      updateUI();
+      showTab("dashboard");
+    }
+
+    function showTab(tab) {
+      document.getElementById("dashboardTab").classList.add("hidden");
+      document.getElementById("historyTab").classList.add("hidden");
+      document.getElementById("tabDashboard").classList.remove("tab-active");
+      document.getElementById("tabHistory").classList.remove("tab-active");
+
+      if (tab === "dashboard") {
+        document.getElementById("dashboardTab").classList.remove("hidden");
+        document.getElementById("tabDashboard").classList.add("tab-active");
+      } else {
+        document.getElementById("historyTab").classList.remove("hidden");
+        document.getElementById("tabHistory").classList.add("tab-active");
+      }
     }
   </script>
 </body>
