@@ -4,33 +4,16 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Checks$</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#2563eb">
   <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", Arial, sans-serif;
-      background-color: #f5f5f7;
-    }
-    .card {
-      @apply bg-white rounded-2xl shadow-md p-6 mb-6 transition-all;
-    }
-    .tab-active {
-      @apply border-b-4 border-blue-500 text-blue-600 font-semibold;
-    }
-    .expense-list {
-      @apply mt-3 text-sm text-gray-600;
-    }
-    .expense-item {
-      @apply flex justify-between border-b py-1;
-    }
-  </style>
+  <link rel="apple-touch-icon" href="icons/icon-192-solid.png">
 </head>
-<body class="flex justify-center min-h-screen items-start py-10 px-4">
-
+<body class="flex justify-center min-h-screen items-start py-10 px-4 bg-gray-100">
   <div class="w-full max-w-md">
     <h1 class="text-2xl font-semibold text-center mb-6">💵 Checks$</h1>
 
-    <!-- Salary input -->
-    <div class="card">
+    <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
       <label for="salary" class="block text-lg font-medium mb-2">Enter your check amount:</label>
       <input id="salary" type="number" placeholder="e.g. 600"
         class="w-full p-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
@@ -40,17 +23,14 @@
       </button>
     </div>
 
-    <!-- Tabs -->
     <div class="flex justify-around mb-6">
-      <button id="tabDashboard" onclick="showTab('dashboard')" class="tab-active px-4 py-2">Dashboard</button>
+      <button id="tabDashboard" onclick="showTab('dashboard')" class="border-b-4 border-blue-500 text-blue-600 font-semibold px-4 py-2">Dashboard</button>
       <button id="tabHistory" onclick="showTab('history')" class="px-4 py-2">History</button>
     </div>
 
-    <!-- Dashboard Tab -->
     <div id="dashboardTab" class="hidden">
 
-      <!-- Needs -->
-      <div class="card">
+      <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
         <h2 class="text-xl font-semibold mb-2">🛒 Needs (50%)</h2>
         <p class="text-gray-600">Budget: $<span id="needsBudget">0</span></p>
         <p class="text-gray-800 font-semibold">Remaining: $<span id="needsRemaining">0</span></p>
@@ -62,8 +42,7 @@
         </div>
       </div>
 
-      <!-- Wants -->
-      <div class="card">
+      <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
         <h2 class="text-xl font-semibold mb-2">🎉 Wants (30%)</h2>
         <p class="text-gray-600">Budget: $<span id="wantsBudget">0</span></p>
         <p class="text-gray-800 font-semibold">Remaining: $<span id="wantsRemaining">0</span></p>
@@ -75,8 +54,7 @@
         </div>
       </div>
 
-      <!-- Savings -->
-      <div class="card">
+      <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
         <h2 class="text-xl font-semibold mb-2">💾 Savings (20%)</h2>
         <p class="text-gray-600">Budget: $<span id="savingsBudget">0</span></p>
         <p class="text-gray-800 font-semibold">Remaining: $<span id="savingsRemaining">0</span></p>
@@ -88,141 +66,34 @@
         </div>
       </div>
 
-      <!-- Clear Button -->
       <button onclick="clearAll()" 
         class="w-full mt-4 bg-red-500 text-white py-3 rounded-xl font-semibold hover:bg-red-600 transition">
         Clear All Data
       </button>
     </div>
 
-    <!-- History Tab -->
     <div id="historyTab" class="hidden">
-      <div class="card">
+      <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
         <h2 class="text-xl font-semibold mb-3">🛒 Needs Expenses</h2>
-        <div id="needsList" class="expense-list"></div>
+        <div id="needsList" class="mt-3 text-sm text-gray-600"></div>
       </div>
-      <div class="card">
+      <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
         <h2 class="text-xl font-semibold mb-3">🎉 Wants Expenses</h2>
-        <div id="wantsList" class="expense-list"></div>
+        <div id="wantsList" class="mt-3 text-sm text-gray-600"></div>
       </div>
-      <div class="card">
+      <div class="bg-white rounded-2xl shadow-md p-6 mb-6">
         <h2 class="text-xl font-semibold mb-3">💾 Savings Expenses</h2>
-        <div id="savingsList" class="expense-list"></div>
+        <div id="savingsList" class="mt-3 text-sm text-gray-600"></div>
       </div>
     </div>
   </div>
 
+  <script src="app.js"></script>
   <script>
-    let budgets = { needs: 0, wants: 0, savings: 0 };
-    let remaining = { needs: 0, wants: 0, savings: 0 };
-    let expenses = { needs: [], wants: [], savings: [] };
-
-    // Load saved data if exists
-    window.onload = function () {
-      const savedData = JSON.parse(localStorage.getItem("salaryApp"));
-      if (savedData) {
-        budgets = savedData.budgets;
-        remaining = savedData.remaining;
-        expenses = savedData.expenses;
-        document.getElementById("salary").value = savedData.salary;
-        updateUI();
-        showTab("dashboard");
-      } else {
-        showTab("dashboard");
-      }
-    };
-
-    function calculateSplit() {
-      const salary = parseFloat(document.getElementById("salary").value);
-      if (isNaN(salary) || salary <= 0) return;
-
-      budgets.needs = salary * 0.5;
-      budgets.wants = salary * 0.3;
-      budgets.savings = salary * 0.2;
-
-      remaining = { ...budgets };
-      expenses = { needs: [], wants: [], savings: [] };
-
-      saveData(salary);
-      updateUI();
-      showTab("dashboard");
-    }
-
-    function addExpense(category) {
-      const input = document.getElementById(category + "Spent");
-      const value = parseFloat(input.value);
-      if (isNaN(value) || value <= 0) return;
-
-      expenses[category].push(value);
-      remaining[category] -= value;
-
-      input.value = ""; // clear input
-      saveData(document.getElementById("salary").value);
-      updateUI();
-    }
-
-    function updateUI() {
-      // Budgets
-      document.getElementById("needsBudget").innerText = budgets.needs.toFixed(2);
-      document.getElementById("wantsBudget").innerText = budgets.wants.toFixed(2);
-      document.getElementById("savingsBudget").innerText = budgets.savings.toFixed(2);
-
-      // Remaining
-      document.getElementById("needsRemaining").innerText = remaining.needs.toFixed(2);
-      document.getElementById("wantsRemaining").innerText = remaining.wants.toFixed(2);
-      document.getElementById("savingsRemaining").innerText = remaining.savings.toFixed(2);
-
-      // Expense lists
-      renderList("needs");
-      renderList("wants");
-      renderList("savings");
-    }
-
-    function renderList(category) {
-      const list = document.getElementById(category + "List");
-      list.innerHTML = "";
-      expenses[category].forEach((exp, i) => {
-        const div = document.createElement("div");
-        div.className = "expense-item";
-        div.innerHTML = `<span>Expense ${i + 1}</span><span>$${exp.toFixed(2)}</span>`;
-        list.appendChild(div);
-      });
-    }
-
-    function saveData(salary) {
-      const data = { 
-        salary, 
-        budgets, 
-        remaining, 
-        expenses,
-        lastUpdated: new Date().toISOString()
-      };
-      localStorage.setItem("salaryApp", JSON.stringify(data));
-    }
-
-    function clearAll() {
-      localStorage.removeItem("salaryApp");
-      budgets = { needs: 0, wants: 0, savings: 0 };
-      remaining = { needs: 0, wants: 0, savings: 0 };
-      expenses = { needs: [], wants: [], savings: [] };
-      document.getElementById("salary").value = "";
-      updateUI();
-      showTab("dashboard");
-    }
-
-    function showTab(tab) {
-      document.getElementById("dashboardTab").classList.add("hidden");
-      document.getElementById("historyTab").classList.add("hidden");
-      document.getElementById("tabDashboard").classList.remove("tab-active");
-      document.getElementById("tabHistory").classList.remove("tab-active");
-
-      if (tab === "dashboard") {
-        document.getElementById("dashboardTab").classList.remove("hidden");
-        document.getElementById("tabDashboard").classList.add("tab-active");
-      } else {
-        document.getElementById("historyTab").classList.remove("hidden");
-        document.getElementById("tabHistory").classList.add("tab-active");
-      }
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/service-worker.js')
+        .then(() => console.log("✅ Service Worker registered"))
+        .catch(err => console.error("SW failed", err));
     }
   </script>
 </body>
